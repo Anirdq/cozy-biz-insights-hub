@@ -19,8 +19,8 @@ export const TrafficChart = () => {
             data={trafficData}
             cx="50%"
             cy="50%"
-            outerRadius={100}
-            innerRadius={40}
+            outerRadius={80}
+            innerRadius={30}
             paddingAngle={2}
             dataKey="visitors"
           >
@@ -39,14 +39,14 @@ export const TrafficChart = () => {
           />
         </PieChart>
       </ResponsiveContainer>
-      <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+      <div className="mt-6 grid grid-cols-3 gap-3 text-sm">
         {trafficData.map((item, index) => (
-          <div key={index} className="flex items-center">
+          <div key={index} className="flex items-center justify-start">
             <div 
-              className="w-3 h-3 rounded-full mr-2" 
+              className="w-3 h-3 rounded-full mr-2 flex-shrink-0" 
               style={{ backgroundColor: item.color }}
             />
-            <span className="text-slate-600 dark:text-slate-400 truncate">
+            <span className="text-slate-600 dark:text-slate-400 truncate text-xs">
               {item.source}: {item.visitors.toLocaleString()}
             </span>
           </div>

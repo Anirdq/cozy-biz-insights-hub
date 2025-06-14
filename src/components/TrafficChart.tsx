@@ -13,7 +13,7 @@ const trafficData = [
 export const TrafficChart = () => {
   return (
     <div className="h-80">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="60%">
         <PieChart>
           <Pie
             data={trafficData}
@@ -39,18 +39,20 @@ export const TrafficChart = () => {
           />
         </PieChart>
       </ResponsiveContainer>
-      <div className="mt-6 grid grid-cols-3 gap-3 text-sm">
-        {trafficData.map((item, index) => (
-          <div key={index} className="flex items-center justify-start">
-            <div 
-              className="w-3 h-3 rounded-full mr-2 flex-shrink-0" 
-              style={{ backgroundColor: item.color }}
-            />
-            <span className="text-slate-600 dark:text-slate-400 truncate text-xs">
-              {item.source}: {item.visitors.toLocaleString()}
-            </span>
-          </div>
-        ))}
+      <div className="mt-4 space-y-2">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+          {trafficData.map((item, index) => (
+            <div key={index} className="flex items-center min-w-0">
+              <div 
+                className="w-3 h-3 rounded-full mr-2 flex-shrink-0" 
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="text-slate-600 dark:text-slate-400 text-xs leading-tight">
+                {item.source}: {item.visitors.toLocaleString()}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

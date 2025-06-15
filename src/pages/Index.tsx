@@ -3,8 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart3, TrendingUp, Users, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
@@ -14,12 +17,28 @@ const Index = () => {
             <BarChart3 className="h-8 w-8 text-blue-600" />
             <h1 className="text-2xl font-bold text-slate-800">BizDash</h1>
           </div>
-          <Link to="/dashboard">
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              Open Dashboard
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <Link to="/dashboard">
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  Open Dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="outline">Sign In</Button>
+                </Link>
+                <Link to="/auth">
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
@@ -33,12 +52,21 @@ const Index = () => {
           <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
             Get real-time insights into your sales, traffic, and KPIs with our intuitive dashboard designed for small businesses.
           </p>
-          <Link to="/dashboard">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
-              View Dashboard
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+          {user ? (
+            <Link to="/dashboard">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
+                View Dashboard
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/auth">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
+                Start Free Trial
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Feature Cards */}

@@ -1,4 +1,3 @@
-
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -10,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { 
@@ -21,6 +21,7 @@ import {
   Settings,
   HelpCircle
 } from "lucide-react";
+import { UserProfile } from "./UserProfile";
 
 const navigationItems = [
   { title: "Home", url: "/", icon: Home },
@@ -113,6 +114,10 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-4">
+        <UserProfile />
+      </SidebarFooter>
     </Sidebar>
   );
 }

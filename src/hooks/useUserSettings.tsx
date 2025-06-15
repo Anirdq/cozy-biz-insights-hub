@@ -55,10 +55,13 @@ export const useUserSettings = () => {
       data?.forEach(({ setting_key, setting_value }) => {
         if (setting_key in loadedSettings) {
           try {
-            loadedSettings[setting_key as keyof UserSettings] = JSON.parse(setting_value);
+            const parsedValue = JSON.parse(setting_value);
+            (loadedSettings as any)[setting_key] = parsedValue;
           } catch {
             // If parsing fails, use the raw value for strings
-            loadedSettings[setting_key as keyof UserSettings] = setting_value as any;
+            if (typeof (loadedSettings as any)[setting_key] === 'string') {
+              (loadedSettings as any)[setting_key] = setting_value;
+            }
           }
         }
       });

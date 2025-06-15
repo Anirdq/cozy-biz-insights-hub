@@ -8,17 +8,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Upload, Download, FileText, Database, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+type TableName = "sales_data" | "traffic_data" | "performance_metrics";
+
 export const DataImportExport = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedTable, setSelectedTable] = useState("sales_data");
+  const [selectedTable, setSelectedTable] = useState<TableName>("sales_data");
   const [isImporting, setIsImporting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
   const tables = [
-    { value: "sales_data", label: "Sales Data" },
-    { value: "traffic_data", label: "Traffic Data" },
-    { value: "performance_metrics", label: "Performance Metrics" },
+    { value: "sales_data" as const, label: "Sales Data" },
+    { value: "traffic_data" as const, label: "Traffic Data" },
+    { value: "performance_metrics" as const, label: "Performance Metrics" },
   ];
 
   const exportData = async () => {
@@ -193,7 +195,7 @@ export const DataImportExport = () => {
     <div className="space-y-6">
       <div className="space-y-2">
         <label className="text-sm font-medium">Select Table</label>
-        <Select value={selectedTable} onValueChange={setSelectedTable}>
+        <Select value={selectedTable} onValueChange={(value: TableName) => setSelectedTable(value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select a table" />
           </SelectTrigger>

@@ -30,9 +30,9 @@ const Sales = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  const totalRevenue = salesData?.reduce((sum, item) => sum + parseFloat(item.revenue), 0) || 0;
+  const totalRevenue = salesData?.reduce((sum, item) => sum + Number(item.revenue), 0) || 0;
   const totalOrders = salesData?.reduce((sum, item) => sum + item.orders, 0) || 0;
-  const avgConversionRate = salesData?.reduce((sum, item) => sum + parseFloat(item.conversion_rate), 0) / (salesData?.length || 1) || 0;
+  const avgConversionRate = salesData?.reduce((sum, item) => sum + Number(item.conversion_rate), 0) / (salesData?.length || 1) || 0;
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'dark bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>

@@ -32,7 +32,7 @@ const Traffic = () => {
 
   const totalVisitors = trafficData?.reduce((sum, item) => sum + item.visitors, 0) || 0;
   const totalPageViews = trafficData?.reduce((sum, item) => sum + item.page_views, 0) || 0;
-  const avgBounceRate = trafficData?.reduce((sum, item) => sum + parseFloat(item.bounce_rate), 0) / (trafficData?.length || 1) || 0;
+  const avgBounceRate = trafficData?.reduce((sum, item) => sum + Number(item.bounce_rate), 0) / (trafficData?.length || 1) || 0;
   const avgSessionDuration = trafficData?.reduce((sum, item) => sum + item.avg_session_duration, 0) / (trafficData?.length || 1) || 0;
 
   return (

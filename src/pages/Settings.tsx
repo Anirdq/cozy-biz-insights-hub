@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,31 +7,23 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Settings as SettingsIcon, Save, User, Bell, Shield } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Settings as SettingsIcon, Save, User, Bell, Shield, Loader2 } from "lucide-react";
+import { useUserSettings } from "@/hooks/useUserSettings";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Settings = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [settings, setSettings] = useState({
-    notifications: true,
-    emailAlerts: false,
-    autoRefresh: true,
-    theme: 'light',
-    refreshInterval: 30
-  });
-  const { toast } = useToast();
+  const { user, signOut } = useAuth();
+  const { settings, isLoading, isSaving, saveAllSettings, saveSetting, setSettings } = useUserSettings();
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
+    saveSetting('theme', isDarkMode ? 'light' : 'dark');
   };
 
   const handleSaveSettings = () => {
-    // Here you would typically save to Supabase user_settings table
-    toast({
-      title: "Settings saved",
-      description: "Your preferences have been updated successfully.",
-    });
+    saveAllSettings(settings);
   };
 
   const handleSettingChange = (key: string, value: any) => {
@@ -40,6 +32,21 @@ const Settings = () => {
       [key]: value
     }));
   };
+
+  const handleImmediateSave = (key: string, value: any) => {
+    saveSetting(key as any, value);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-slate-600">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'dark bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
@@ -90,15 +97,34 @@ const Settings = () => {
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
-                      <Input id="name" placeholder="Enter your name" />
+                      <Input 
+                        id="name" 
+                        placeholder="Enter your name"
+                        value={settings.fullName}
+                        onChange={(e) => handleSettingChange('fullName', e.target.value)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" placeholder="Enter your email" />
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="Enter your email"
+                        value={settings.email}
+                        onChange={(e) => handleSettingChange('email', e.target.value)}
+                        disabled
+                        className="bg-gray-50"
+                      />
+                      <p className="text-xs text-slate-500">Email cannot be changed here. Contact support if needed.</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="company">Company</Label>
-                      <Input id="company" placeholder="Enter company name" />
+                      <Input 
+                        id="company" 
+                        placeholder="Enter company name"
+                        value={settings.company}
+                        onChange={(e) => handleSettingChange('company', e.target.value)}
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -124,7 +150,7 @@ const Settings = () => {
                       </div>
                       <Switch
                         checked={settings.notifications}
-                        onCheckedChange={(checked) => handleSettingChange('notifications', checked)}
+                        onCheckedChange={(checked) => handleImmediateSave('notifications', checked)}
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -136,7 +162,7 @@ const Settings = () => {
                       </div>
                       <Switch
                         checked={settings.emailAlerts}
-                        onCheckedChange={(checked) => handleSettingChange('emailAlerts', checked)}
+                        onCheckedChange={(checked) => handleImmediateSave('emailAlerts', checked)}
                       />
                     </div>
                   </CardContent>
@@ -163,7 +189,7 @@ const Settings = () => {
                       </div>
                       <Switch
                         checked={settings.autoRefresh}
-                        onCheckedChange={(checked) => handleSettingChange('autoRefresh', checked)}
+                        onCheckedChange={(checked) => handleImmediateSave('autoRefresh', checked)}
                       />
                     </div>
                     <div className="space-y-2">
@@ -172,7 +198,8 @@ const Settings = () => {
                         id="refresh-interval"
                         type="number"
                         value={settings.refreshInterval}
-                        onChange={(e) => handleSettingChange('refreshInterval', parseInt(e.target.value))}
+                        onChange={(e) => handleSettingChange('refreshInterval', parseInt(e.target.value) || 30)}
+                        onBlur={() => handleImmediateSave('refreshInterval', settings.refreshInterval)}
                         min="10"
                         max="300"
                       />
@@ -198,8 +225,16 @@ const Settings = () => {
                     <Button variant="outline" className="w-full">
                       Enable Two-Factor Auth
                     </Button>
-                    <Button variant="destructive" className="w-full">
-                      Delete Account
+                    <Button 
+                      variant="destructive" 
+                      className="w-full"
+                      onClick={() => {
+                        if (confirm('Are you sure you want to sign out?')) {
+                          signOut();
+                        }
+                      }}
+                    >
+                      Sign Out
                     </Button>
                   </CardContent>
                 </Card>
@@ -207,9 +242,22 @@ const Settings = () => {
 
               {/* Save Button */}
               <div className="mt-8 flex justify-end">
-                <Button onClick={handleSaveSettings} className="bg-blue-600 hover:bg-blue-700">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Settings
+                <Button 
+                  onClick={handleSaveSettings} 
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Settings
+                    </>
+                  )}
                 </Button>
               </div>
             </main>

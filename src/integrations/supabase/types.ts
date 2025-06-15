@@ -9,7 +9,144 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      help_articles: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      performance_metrics: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          metric_name: string
+          metric_value: number
+          target_value: number | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          metric_name: string
+          metric_value: number
+          target_value?: number | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          metric_name?: string
+          metric_value?: number
+          target_value?: number | null
+        }
+        Relationships: []
+      }
+      sales_data: {
+        Row: {
+          conversion_rate: number
+          created_at: string
+          date: string
+          id: string
+          orders: number
+          revenue: number
+        }
+        Insert: {
+          conversion_rate?: number
+          created_at?: string
+          date: string
+          id?: string
+          orders?: number
+          revenue?: number
+        }
+        Update: {
+          conversion_rate?: number
+          created_at?: string
+          date?: string
+          id?: string
+          orders?: number
+          revenue?: number
+        }
+        Relationships: []
+      }
+      traffic_data: {
+        Row: {
+          avg_session_duration: number
+          bounce_rate: number
+          created_at: string
+          date: string
+          id: string
+          page_views: number
+          visitors: number
+        }
+        Insert: {
+          avg_session_duration?: number
+          bounce_rate?: number
+          created_at?: string
+          date: string
+          id?: string
+          page_views?: number
+          visitors?: number
+        }
+        Update: {
+          avg_session_duration?: number
+          bounce_rate?: number
+          created_at?: string
+          date?: string
+          id?: string
+          page_views?: number
+          visitors?: number
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string
+          id: string
+          setting_key: string
+          setting_value: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setting_key: string
+          setting_value: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setting_key?: string
+          setting_value?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

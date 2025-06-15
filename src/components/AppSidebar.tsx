@@ -28,14 +28,14 @@ const navigationItems = [
 ];
 
 const analyticsItems = [
-  { title: "Sales", url: "/dashboard", icon: DollarSign },
-  { title: "Traffic", url: "/dashboard", icon: Users },
-  { title: "Performance", url: "/dashboard", icon: TrendingUp },
+  { title: "Sales", url: "/sales", icon: DollarSign },
+  { title: "Traffic", url: "/traffic", icon: Users },
+  { title: "Performance", url: "/performance", icon: TrendingUp },
 ];
 
 const settingsItems = [
-  { title: "Settings", url: "/dashboard", icon: Settings },
-  { title: "Help", url: "/dashboard", icon: HelpCircle },
+  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Help", url: "/help", icon: HelpCircle },
 ];
 
 export function AppSidebar() {

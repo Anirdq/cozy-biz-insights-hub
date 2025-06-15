@@ -1,16 +1,55 @@
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
-const trafficData = [
-  { source: 'Organic Search', visitors: 4200, color: '#14B8A6' },
-  { source: 'Direct', visitors: 3100, color: '#8B5CF6' },
-  { source: 'Social Media', visitors: 2400, color: '#F59E0B' },
-  { source: 'Email', visitors: 1800, color: '#EF4444' },
-  { source: 'Referral', visitors: 1200, color: '#6366F1' },
-  { source: 'Paid Ads', visitors: 800, color: '#10B981' }
-];
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const TrafficChart = () => {
+  const { data: trafficData, isLoading, error } = useQuery({
+    queryKey: ['traffic-chart-data'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('traffic_data')
+        .select('*')
+        .order('date', { ascending: true });
+      
+      if (error) throw error;
+      
+      // Transform data for pie chart - group by source or create mock sources
+      const colors = ['#14B8A6', '#8B5CF6', '#F59E0B', '#EF4444', '#6366F1', '#10B981'];
+      const sources = ['Organic Search', 'Direct', 'Social Media', 'Email', 'Referral', 'Paid Ads'];
+      
+      return data?.slice(0, 6).map((item, index) => ({
+        source: sources[index] || `Source ${index + 1}`,
+        visitors: item.visitors,
+        color: colors[index] || '#64748B'
+      })) || [];
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-slate-500">Loading traffic data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-red-500">Error loading traffic data</div>
+      </div>
+    );
+  }
+
+  if (!trafficData || trafficData.length === 0) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-slate-500">No traffic data available</div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="60%">

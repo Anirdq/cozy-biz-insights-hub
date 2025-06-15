@@ -1,22 +1,52 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
-
-const salesData = [
-  { month: 'Jan', revenue: 4200, orders: 28 },
-  { month: 'Feb', revenue: 5100, orders: 34 },
-  { month: 'Mar', revenue: 4800, orders: 31 },
-  { month: 'Apr', revenue: 6200, orders: 42 },
-  { month: 'May', revenue: 7100, orders: 48 },
-  { month: 'Jun', revenue: 6900, orders: 46 },
-  { month: 'Jul', revenue: 8200, orders: 55 },
-  { month: 'Aug', revenue: 7800, orders: 52 },
-  { month: 'Sep', revenue: 8900, orders: 59 },
-  { month: 'Oct', revenue: 9400, orders: 63 },
-  { month: 'Nov', revenue: 10200, orders: 68 },
-  { month: 'Dec', revenue: 11500, orders: 76 }
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const SalesChart = () => {
+  const { data: salesData, isLoading, error } = useQuery({
+    queryKey: ['sales-chart-data'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sales_data')
+        .select('*')
+        .order('date', { ascending: true });
+      
+      if (error) throw error;
+      
+      // Transform the data to match the chart format
+      return data?.map(item => ({
+        month: new Date(item.date).toLocaleDateString('en-US', { month: 'short' }),
+        revenue: Number(item.revenue),
+        orders: item.orders
+      })) || [];
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-slate-500">Loading sales data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-red-500">Error loading sales data</div>
+      </div>
+    );
+  }
+
+  if (!salesData || salesData.length === 0) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-slate-500">No sales data available</div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">

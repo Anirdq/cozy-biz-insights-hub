@@ -20,10 +20,48 @@ import { TrafficChart } from "@/components/TrafficChart";
 import { KPIChart } from "@/components/KPIChart";
 import { MetricCard } from "@/components/MetricCard";
 import { ExportDialog } from "@/components/ExportDialog";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
+
+  // Fetch real data for metric cards
+  const { data: salesSummary, isLoading: salesLoading } = useQuery({
+    queryKey: ['sales-summary'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sales_data')
+        .select('*')
+        .order('date', { ascending: false });
+      
+      if (error) throw error;
+      
+      const totalRevenue = data?.reduce((sum, item) => sum + Number(item.revenue), 0) || 0;
+      const totalOrders = data?.reduce((sum, item) => sum + item.orders, 0) || 0;
+      const avgConversion = data?.reduce((sum, item) => sum + Number(item.conversion_rate), 0) / (data?.length || 1) || 0;
+      
+      return { totalRevenue, totalOrders, avgConversion };
+    }
+  });
+
+  const { data: trafficSummary, isLoading: trafficLoading } = useQuery({
+    queryKey: ['traffic-summary'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('traffic_data')
+        .select('*')
+        .order('date', { ascending: false });
+      
+      if (error) throw error;
+      
+      const totalVisitors = data?.reduce((sum, item) => sum + item.visitors, 0) || 0;
+      const totalPageViews = data?.reduce((sum, item) => sum + item.page_views, 0) || 0;
+      
+      return { totalVisitors, totalPageViews };
+    }
+  });
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -83,35 +121,39 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <MetricCard
                   title="Total Revenue"
-                  value="$47,521"
+                  value={salesSummary ? `$${salesSummary.totalRevenue.toLocaleString()}` : "$0"}
                   change="+12.5%"
                   trend="up"
                   icon={DollarSign}
                   color="blue"
+                  isLoading={salesLoading}
                 />
                 <MetricCard
                   title="Website Visitors"
-                  value="12,345"
+                  value={trafficSummary ? trafficSummary.totalVisitors.toLocaleString() : "0"}
                   change="+8.2%"
                   trend="up"
                   icon={Users}
                   color="teal"
+                  isLoading={trafficLoading}
                 />
                 <MetricCard
                   title="Page Views"
-                  value="89,432"
+                  value={trafficSummary ? trafficSummary.totalPageViews.toLocaleString() : "0"}
                   change="-2.4%"
                   trend="down"
                   icon={Eye}
                   color="purple"
+                  isLoading={trafficLoading}
                 />
                 <MetricCard
                   title="Conversion Rate"
-                  value="3.24%"
+                  value={salesSummary ? `${salesSummary.avgConversion.toFixed(2)}%` : "0%"}
                   change="+0.8%"
                   trend="up"
                   icon={ShoppingCart}
                   color="green"
+                  isLoading={salesLoading}
                 />
               </div>
 

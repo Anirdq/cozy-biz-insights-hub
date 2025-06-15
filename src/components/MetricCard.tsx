@@ -10,6 +10,7 @@ interface MetricCardProps {
   trend: 'up' | 'down';
   icon: LucideIcon;
   color: 'blue' | 'teal' | 'purple' | 'green';
+  isLoading?: boolean;
 }
 
 const colorClasses = {
@@ -31,10 +32,27 @@ const colorClasses = {
   }
 };
 
-export const MetricCard = ({ title, value, change, trend, icon: Icon, color }: MetricCardProps) => {
+export const MetricCard = ({ title, value, change, trend, icon: Icon, color, isLoading = false }: MetricCardProps) => {
   const TrendIcon = trend === 'up' ? TrendingUp : TrendingDown;
   const trendColor = trend === 'up' ? 'text-green-600' : 'text-red-600';
   const classes = colorClasses[color];
+
+  if (isLoading) {
+    return (
+      <Card className="border-0 shadow-lg bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
+        <CardContent className="p-6">
+          <div className="animate-pulse">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-8 w-8 bg-gray-200 rounded-lg"></div>
+              <div className="h-6 w-16 bg-gray-200 rounded"></div>
+            </div>
+            <div className="h-4 w-24 bg-gray-200 rounded mb-2"></div>
+            <div className="h-8 w-20 bg-gray-200 rounded"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-0 shadow-lg bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">

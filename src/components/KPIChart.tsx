@@ -1,22 +1,53 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-
-const kpiData = [
-  { month: 'Jan', conversionRate: 2.1, avgOrderValue: 150, customerLifetime: 450 },
-  { month: 'Feb', conversionRate: 2.3, avgOrderValue: 155, customerLifetime: 460 },
-  { month: 'Mar', conversionRate: 2.0, avgOrderValue: 148, customerLifetime: 440 },
-  { month: 'Apr', conversionRate: 2.7, avgOrderValue: 162, customerLifetime: 485 },
-  { month: 'May', conversionRate: 2.9, avgOrderValue: 168, customerLifetime: 510 },
-  { month: 'Jun', conversionRate: 2.8, avgOrderValue: 165, customerLifetime: 495 },
-  { month: 'Jul', conversionRate: 3.1, avgOrderValue: 172, customerLifetime: 520 },
-  { month: 'Aug', conversionRate: 3.0, avgOrderValue: 170, customerLifetime: 515 },
-  { month: 'Sep', conversionRate: 3.3, avgOrderValue: 178, customerLifetime: 535 },
-  { month: 'Oct', conversionRate: 3.5, avgOrderValue: 182, customerLifetime: 550 },
-  { month: 'Nov', conversionRate: 3.4, avgOrderValue: 180, customerLifetime: 545 },
-  { month: 'Dec', conversionRate: 3.7, avgOrderValue: 185, customerLifetime: 560 }
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const KPIChart = () => {
+  const { data: kpiData, isLoading, error } = useQuery({
+    queryKey: ['kpi-chart-data'],
+    queryFn: async () => {
+      const { data: salesData, error: salesError } = await supabase
+        .from('sales_data')
+        .select('*')
+        .order('date', { ascending: true });
+      
+      if (salesError) throw salesError;
+      
+      // Transform the data to match the chart format
+      return salesData?.map(item => ({
+        month: new Date(item.date).toLocaleDateString('en-US', { month: 'short' }),
+        conversionRate: Number(item.conversion_rate),
+        avgOrderValue: Number(item.revenue) / Math.max(item.orders, 1),
+        customerLifetime: Number(item.revenue) / Math.max(item.orders, 1) * 3 // Mock calculation
+      })) || [];
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <div className="text-slate-500">Loading performance data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <div className="text-red-500">Error loading performance data</div>
+      </div>
+    );
+  }
+
+  if (!kpiData || kpiData.length === 0) {
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <div className="text-slate-500">No performance data available</div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-96">
       <ResponsiveContainer width="100%" height="100%">
@@ -48,9 +79,9 @@ export const KPIChart = () => {
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' 
             }}
             formatter={(value, name) => {
-              if (name === 'conversionRate') return [`${value}%`, 'Conversion Rate'];
-              if (name === 'avgOrderValue') return [`$${value}`, 'Avg Order Value'];
-              if (name === 'customerLifetime') return [`$${value}`, 'Customer Lifetime Value'];
+              if (name === 'conversionRate') return [`${Number(value).toFixed(1)}%`, 'Conversion Rate'];
+              if (name === 'avgOrderValue') return [`$${Number(value).toFixed(0)}`, 'Avg Order Value'];
+              if (name === 'customerLifetime') return [`$${Number(value).toFixed(0)}`, 'Customer Lifetime Value'];
               return [value, name];
             }}
           />

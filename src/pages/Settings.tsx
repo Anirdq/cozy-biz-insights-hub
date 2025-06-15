@@ -7,14 +7,24 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Settings as SettingsIcon, Save, User, Bell, Shield, Loader2 } from "lucide-react";
+import { Settings as SettingsIcon, Save, User, Bell, Shield, Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Settings = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { user, signOut } = useAuth();
-  const { settings, isLoading, isSaving, saveAllSettings, saveSetting, setSettings } = useUserSettings();
+  const { 
+    settings, 
+    isLoading, 
+    isSaving, 
+    error,
+    savingField,
+    saveAllSettings, 
+    saveSetting, 
+    setSettings,
+    retryLoadSettings 
+  } = useUserSettings();
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -22,8 +32,11 @@ const Settings = () => {
     saveSetting('theme', isDarkMode ? 'light' : 'dark');
   };
 
-  const handleSaveSettings = () => {
-    saveAllSettings(settings);
+  const handleSaveSettings = async () => {
+    const success = await saveAllSettings(settings);
+    if (!success) {
+      console.log('Settings save failed');
+    }
   };
 
   const handleSettingChange = (key: string, value: any) => {
@@ -33,16 +46,41 @@ const Settings = () => {
     }));
   };
 
-  const handleImmediateSave = (key: string, value: any) => {
-    saveSetting(key as any, value);
+  const handleImmediateSave = async (key: string, value: any) => {
+    const success = await saveSetting(key as any, value);
+    if (!success) {
+      // Revert the change if save failed
+      setSettings(prev => ({
+        ...prev,
+        [key]: !value
+      }));
+    }
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
           <p className="text-slate-600">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state with retry option
+  if (error && !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Settings Unavailable</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button onClick={retryLoadSettings} variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+          </Button>
         </div>
       </div>
     );
@@ -80,6 +118,23 @@ const Settings = () => {
                 <p className="text-slate-600 dark:text-slate-400">
                   Manage your account preferences and dashboard settings
                 </p>
+                
+                {error && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center">
+                      <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+                      <p className="text-red-700 text-sm">{error}</p>
+                      <Button 
+                        onClick={retryLoadSettings} 
+                        variant="outline" 
+                        size="sm" 
+                        className="ml-auto"
+                      >
+                        Retry
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -89,6 +144,9 @@ const Settings = () => {
                     <CardTitle className="flex items-center text-slate-800 dark:text-white">
                       <User className="h-5 w-5 mr-2 text-blue-600" />
                       Profile Information
+                      {savingField && ['fullName', 'company'].includes(savingField) && (
+                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                      )}
                     </CardTitle>
                     <CardDescription className="dark:text-slate-400">
                       Update your personal information
@@ -102,6 +160,7 @@ const Settings = () => {
                         placeholder="Enter your name"
                         value={settings.fullName}
                         onChange={(e) => handleSettingChange('fullName', e.target.value)}
+                        disabled={savingField === 'fullName'}
                       />
                     </div>
                     <div className="space-y-2">
@@ -124,6 +183,7 @@ const Settings = () => {
                         placeholder="Enter company name"
                         value={settings.company}
                         onChange={(e) => handleSettingChange('company', e.target.value)}
+                        disabled={savingField === 'company'}
                       />
                     </div>
                   </CardContent>
@@ -135,6 +195,9 @@ const Settings = () => {
                     <CardTitle className="flex items-center text-slate-800 dark:text-white">
                       <Bell className="h-5 w-5 mr-2 text-teal-600" />
                       Notifications
+                      {savingField && ['notifications', 'emailAlerts'].includes(savingField) && (
+                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                      )}
                     </CardTitle>
                     <CardDescription className="dark:text-slate-400">
                       Configure your notification preferences
@@ -151,6 +214,7 @@ const Settings = () => {
                       <Switch
                         checked={settings.notifications}
                         onCheckedChange={(checked) => handleImmediateSave('notifications', checked)}
+                        disabled={savingField === 'notifications'}
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -163,6 +227,7 @@ const Settings = () => {
                       <Switch
                         checked={settings.emailAlerts}
                         onCheckedChange={(checked) => handleImmediateSave('emailAlerts', checked)}
+                        disabled={savingField === 'emailAlerts'}
                       />
                     </div>
                   </CardContent>
@@ -174,6 +239,9 @@ const Settings = () => {
                     <CardTitle className="flex items-center text-slate-800 dark:text-white">
                       <SettingsIcon className="h-5 w-5 mr-2 text-purple-600" />
                       Dashboard Preferences
+                      {savingField && ['autoRefresh', 'refreshInterval'].includes(savingField) && (
+                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                      )}
                     </CardTitle>
                     <CardDescription className="dark:text-slate-400">
                       Customize your dashboard experience
@@ -190,6 +258,7 @@ const Settings = () => {
                       <Switch
                         checked={settings.autoRefresh}
                         onCheckedChange={(checked) => handleImmediateSave('autoRefresh', checked)}
+                        disabled={savingField === 'autoRefresh'}
                       />
                     </div>
                     <div className="space-y-2">
@@ -202,6 +271,7 @@ const Settings = () => {
                         onBlur={() => handleImmediateSave('refreshInterval', settings.refreshInterval)}
                         min="10"
                         max="300"
+                        disabled={savingField === 'refreshInterval'}
                       />
                     </div>
                   </CardContent>

@@ -1,73 +1,52 @@
-# Welcome to your Lovable project
+# Cozy Biz Insights Hub 🧠📊
 
-## Project info
+A smart, elegant, and user-friendly dashboard that empowers small and mid-sized business owners to understand and act on performance data with confidence.
 
-**URL**: https://lovable.dev/projects/476c7261-1389-4fd3-a83d-305f5f50e729
+## 🚀 Live Preview
 
-## How can I edit this code?
+🌐 [Explore the Dashboard →](https://preview--cozy-biz-insights-hub.lovable.app/dashboard)
 
-There are several ways of editing your application.
+## 📌 Overview
 
-**Use Lovable**
+**Cozy Biz Insights Hub** provides a warm, intuitive interface to help businesses visualize growth trends, monitor KPIs, and identify areas needing attention — all from a single glance.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/476c7261-1389-4fd3-a83d-305f5f50e729) and start prompting.
+### 🧩 Key Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- 📈 **Real-time Business Metrics** – Revenue, Conversion, Sessions, Customers & more
+- 🗂️ **Modular Dashboard Design** – Customizable insights by category
+- 🎨 **Modern, Cozy UI** – Designed for clarity, readability, and minimal distractions
+- 🌗 **Dark Mode Ready** – Comfortable viewing day and night
+- ⚙️ **Responsive & Accessible** – Works across devices, keyboard and screen-reader friendly
 
-**Use your preferred IDE**
+## 📸 Screenshots
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+![Dashboard Overview](./screenshots/dashboard-overview.png)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🛠️ Tech Stack
 
-Follow these steps:
+- **Framework**: React.js + Vite
+- **Design**: Tailwind CSS + ShadCN UI
+- **Charts**: Recharts.js
+- **Deployment**: Vercel
+- **Design Inspiration**: [Lovable](https://lovable.app) AI-Powered Design Assistant
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🔐 Security & Privacy
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- No sensitive data is stored
+- All visuals are mock insights for demonstration purposes
+- Built with modern best practices in security & performance
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🧠 Potential Use Cases
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+- Startup Founders monitoring growth KPIs
+- Small business owners needing simplified reporting
+- Agencies building client-facing dashboards
+- Creators tracking conversion and engagement data
+
+## 📦 Installation
+
+```bash
+git clone https://github.com/your-username/cozy-biz-insights-hub.git
+cd cozy-biz-insights-hub
+npm install
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/476c7261-1389-4fd3-a83d-305f5f50e729) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
